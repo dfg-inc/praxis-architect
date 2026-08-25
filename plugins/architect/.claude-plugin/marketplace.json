@@ -1,0 +1,15 @@
+{
+  "name": "praxis",
+  "owner": {
+    "name": "dfuture-co"
+  },
+  "description": "Praxis Phase 1 marketplace entry for praxis-architect.",
+  "plugins": [
+    {
+      "name": "praxis-architect",
+      "source": "./",
+      "description": "Praxis Architect — design packages, decisions, NFR budgets, platform contracts.",
+      "version": "0.1.0"
+    }
+  ]
+}

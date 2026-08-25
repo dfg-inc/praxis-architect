@@ -1,0 +1,17 @@
+{
+  "name": "praxis-architect",
+  "version": "0.1.0",
+  "description": "Praxis Architect plugin: intake audit, divergence handling, design packages, and decision records.",
+  "author": {
+    "name": "dfuture-co"
+  },
+  "license": "Apache-2.0",
+  "keywords": [
+    "praxis",
+    "architect",
+    "architecture",
+    "design",
+    "nfr"
+  ],
+  "defaultEnabled": true
+}

@@ -1,0 +1,14 @@
+{
+  "name": "@praxis/architect",
+  "version": "0.1.0",
+  "private": true,
+  "description": "praxis-architect Claude Code plugin",
+  "license": "Apache-2.0",
+  "scripts": {
+    "build-package": "node ./tools/build-architecture-package.mjs",
+    "session-bootstrap": "node ./tools/session-bootstrap.mjs"
+  },
+  "dependencies": {
+    "@praxis/plugin-sdk": "0.1.0"
+  }
+}
