@@ -9,6 +9,6 @@
     "session-bootstrap": "node ./tools/session-bootstrap.mjs"
   },
   "dependencies": {
-    "@praxis/plugin-sdk": "0.1.0"
+    "@praxis/plugin-sdk": "*"
   }
 }
