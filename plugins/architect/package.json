@@ -1,6 +1,6 @@
 {
   "name": "@praxis/architect",
-  "version": "0.1.0-alpha.4",
+  "version": "0.1.0-alpha.5",
   "private": true,
   "description": "praxis-architect Claude Code plugin",
   "license": "Apache-2.0",

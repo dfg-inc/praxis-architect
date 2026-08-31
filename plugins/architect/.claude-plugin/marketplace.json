@@ -9,7 +9,7 @@
       "name": "praxis-architect",
       "source": "./",
       "description": "Praxis Architect — design packages, decisions, NFR budgets, platform contracts.",
-      "version": "0.1.0-alpha.4"
+      "version": "0.1.0-alpha.5"
     }
   ]
 }
