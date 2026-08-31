@@ -1,6 +1,6 @@
 ---
 name: nfr-budget
-description: Define an NFR budget: metric, limit, how and when it is verified (WBS 4.10).
+description: "Define an NFR budget: metric, limit, how and when it is verified (WBS 4.10)."
 ---
 
 # NFR Budget
