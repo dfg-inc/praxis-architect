@@ -1,6 +1,6 @@
 {
   "name": "praxis-architect",
-  "version": "0.1.0-alpha.7",
+  "version": "0.1.0-alpha.8",
   "description": "Praxis Architect plugin: intake audit, divergence handling, design packages, and decision records.",
   "author": {
     "name": "dfuture-co"
