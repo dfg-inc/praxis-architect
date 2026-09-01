@@ -6,6 +6,7 @@
   "license": "Apache-2.0",
   "scripts": {
     "build-package": "node ./tools/build-architecture-package.mjs",
+    "emit-developer-handoff": "node ./tools/emit-developer-handoff.mjs",
     "session-bootstrap": "node ./tools/session-bootstrap.mjs"
   },
   "dependencies": {

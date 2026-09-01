@@ -25,6 +25,7 @@ Break the design into trackable Feature/Story units with clear ready-for-dev cri
 ## Outputs
 
 - Feature/story list with `readyForDev` flags
+- Update `design/<workPackageId>/change-intent.json` `features[]` so every in-delivery feature has `readyForDev: true` before `context-slice` / `emit-developer-handoff`
 
 ## Human gates
 

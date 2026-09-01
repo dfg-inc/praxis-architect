@@ -36,6 +36,7 @@ design/<workPackageId>/
   contracts.md             # linked contract paths + compatibility notes
   nfr-budgets.md           # linked budgets + verify moments
   open-questions.md        # prefer empty before handoff
+  change-intent.json       # MACHINE: patches + features for Developer (required)
 ```
 
 Project may relocate under `.project` `design.root`; default is `design/<workPackageId>/`.
@@ -44,6 +45,7 @@ Project may relocate under `.project` `design.root`; default is `design/<workPac
 
 1. **Preflight**  
    - Intake audit verdict `pass` or acknowledged `pass-with-warnings`.  
+   - Machine `ba.architect.handoff` present (from BA `wp approve-plan`).  
    - Every divergence point that required a decision has an `accepted` ADR (or an explicit deferred open question with human ok).  
    - List ADR ids that bind this WP.
 
@@ -76,13 +78,38 @@ Project may relocate under `.project` `design.root`; default is `design/<workPac
 8. **`open-questions.md`**  
    Prefer empty. Any remaining open must be severity-tagged; high severity blocks handoff readiness.
 
-9. **Self-check**  
+9. **Write `change-intent.json` (machine, required)**  
+   Product-agnostic patch + feature intent consumed by `emit-developer-handoff`. Derive from BA scope + accepted decisions — **never** hardcode a sample product. Include at minimum:
+
+   ```json
+   {
+     "decisionIds": ["ADR-…"],
+     "requirementIds": ["…from ba handoff…"],
+     "features": [{ "id": "FEAT-…", "title": "…", "readyForDev": true }],
+     "changes": [
+       { "file": "path/in/product", "description": "…", "match": "…", "replace": "…" }
+     ],
+     "acceptanceChecks": [{ "file": "…", "contains": "…" }],
+     "design": {
+       "title": "…",
+       "decision": "…",
+       "contextInScope": ["…"],
+       "outOfScope": ["…"],
+       "changeIntent": "one-liner"
+     }
+   }
+   ```
+
+   `changes` may use `match`/`replace` or `write` for new files. Omit empty — handoff emit will fail.
+
+10. **Self-check**  
    - Every diagram renders as text in a markdown viewer.  
    - Every ADR id resolves on disk.  
-   - Non-goals explicit in `index.md`.
+   - Non-goals explicit in `index.md`.  
+   - `change-intent.json` parses and lists `readyForDev: true` features.
 
-10. **Handoff path**  
-    Record `designPackagePath: "design/<workPackageId>/"` for later `architect.developer.handoff` (filled fully in `context-slice` / decompose).
+11. **Handoff path**  
+    Record `designPackagePath: "design/<workPackageId>/"` for later `architect.developer.handoff` (filled fully in `context-slice` / emit).
 
 ## Human gates
 
@@ -94,7 +121,7 @@ Project may relocate under `.project` `design.root`; default is `design/<workPac
 
 ## Done when
 
-- Folder `design/<workPackageId>/` contains index, decisions, contracts, budgets, ≥1 text diagram.
+- Folder `design/<workPackageId>/` contains index, decisions, contracts, budgets, ≥1 text diagram, **and** `change-intent.json`.
 - Diagrams are text-only and self-contained.
 - Binding ADR/contract/budget links resolve.
 - Package is usable input to `decompose-features` without inventing architecture.
@@ -105,6 +132,7 @@ Project may relocate under `.project` `design.root`; default is `design/<workPac
 |------|----------|
 | Binary-only diagrams | Replace with Mermaid/ASCII |
 | Package without linked decisions | Incomplete — add `decisions.md` |
+| Missing `change-intent.json` | Incomplete — write machine intent before context-slice emit |
 | Open high-severity questions left silent | Block handoff; human gate |
 | Inventing new ADRs inside design package | Stop; run `record-decision` first |
 | Skipping intake-fail packages | **Forbidden** |

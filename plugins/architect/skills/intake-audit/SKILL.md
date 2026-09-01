@@ -19,7 +19,7 @@ Do **not** use to shape requirements (BA owns that) or to record ADRs.
 
 | Input | Path / source |
 |-------|----------------|
-| Handoff JSON | `ba.architect.handoff` (`packages/contracts`: `BaToArchitectHandoffSchema`) |
+| Handoff JSON | `ba.architect.handoff` at `wp/<workPackageId>/handoffs/ba-architect.handoff.json` (emitted by `wp approve-plan`) |
 | WP folder | `workPackagePath` from handoff, typically `wp/<id>/index.md` |
 | Requirements | Paths resolved from WP `## Scope` / `requirementIds` |
 | Vision | Canon vision page referenced by BA readiness |
@@ -27,9 +27,13 @@ Do **not** use to shape requirements (BA owns that) or to record ADRs.
 
 ## Steps
 
-1. **Validate handoff schema**  
+1. **Locate + validate handoff schema**  
+   Prefer the machine file from BA approval:
+
+   `wp/<workPackageId>/handoffs/ba-architect.handoff.json`
+
    Parse against `BaToArchitectHandoffSchema`. Required: `contract: "ba.architect.handoff"`, `version`, `workPackageId`, `workPackagePath`, non-empty `requirementIds`, `visionConfirmed`, `readinessChecks[]`.  
-   Schema fail → severity `block`, stop; do not invent fields.
+   Missing file or schema fail → severity `block`, stop; ask BA to re-run `wp approve-plan` (or `tools/emit-architect-handoff.mjs`). Do not invent fields. Markdown WP alone is **not** a substitute for the machine handoff.
 
 2. **Resolve files**  
    Read `workPackagePath`. For each `requirementId`, open the canon page (FR/NFR/BR). If a path cannot be resolved → `block` finding `missing-artifact`.

@@ -81,21 +81,30 @@ This path becomes `contextSlicePath` on `architect.developer.handoff`.
 4. **Boundary check**  
    Every `accepted` ADR that `decisions.md` marks as applying to this WP appears under **In slice**. If an ADR would be omitted, either add it or AskUserQuestion to confirm omission.
 
-5. **Emit handoff fields** (do not invent features here — use decompose output):
+5. **Emit machine handoff (hard gate — do not skip)**  
 
-   Prepare / update JSON conforming to `ArchitectToDeveloperHandoffSchema`:
-   - `contract: "architect.developer.handoff"`
-   - `version` (semver of contract)
-   - `workPackageId`
-   - `designPackagePath: "design/<workPackageId>/"`
-   - `contextSlicePath: "design/<workPackageId>/context-slice.md"`
-   - `decisionIds` — same as slice
-   - `features[]` with `readyForDev` from decompose/estimate
+   Ensure `design/<workPackageId>/change-intent.json` exists (from `design-package` / decompose) with non-empty `changes` and features `readyForDev: true`. Then run:
 
-   Persist handoff beside the package if the project keeps artifacts on disk, e.g. `design/<workPackageId>/handoff.json`.
+   ```
+   node ${CLAUDE_PLUGIN_ROOT}/tools/emit-developer-handoff.mjs \
+     --ba-handoff wp/<workPackageId>/handoffs/ba-architect.handoff.json \
+     --design-dir design/<workPackageId> \
+     --out design \
+     --product <product-root>
+   ```
+
+   (Paths may be absolute; `--canon` + `--wp` may replace `--ba-handoff`.)
+
+   This writes **both**:
+   - `design/<workPackageId>/change-spec.json`
+   - `design/<workPackageId>/architect-developer.handoff.json`
+
+   with `contract: "architect.developer.handoff"`, `version`, `workPackageId`, `designPackagePath`, `contextSlicePath`, `decisionIds`, and `features[]` with `readyForDev: true`.
+
+   Markdown-only packages are **incomplete**. Do not announce Developer handoff until both JSON files exist and the tool exits 0. Do not hand-author placeholder JSON.
 
 6. **Announce**  
-   Slice path + decision count + any residual opens for Developer `accept-work-package`.
+   Slice path + `architect-developer.handoff.json` path + decision count + any residual opens for Developer `accept-work-package`.
 
 ## Human gates
 
@@ -108,6 +117,7 @@ This path becomes `contextSlicePath` on `architect.developer.handoff`.
 ## Done when
 
 - `design/<workPackageId>/context-slice.md` exists with in-slice / out-of-slice / non-negotiables.
+- `design/<workPackageId>/change-spec.json` and `architect-developer.handoff.json` exist (from `emit-developer-handoff`).
 - `decisionIds` on the handoff match the slice.
 - Out-of-slice boundaries are explicit (not “see architecture/”).
 - Package is ready for Developer `accept-work-package`.
@@ -122,3 +132,4 @@ This path becomes `contextSlicePath` on `architect.developer.handoff`.
 | Handoff `decisionIds` ≠ slice | Align before publish |
 | Pointing at missing design package | Fix `design-package` first |
 | Empty must-read when code exists | Add at least the primary module paths |
+| Skipping emit-developer-handoff | **Forbidden** — Markdown-only is not a Developer intake |

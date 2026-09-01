@@ -15,7 +15,7 @@ You route Architect work through stage gates. You do not invent irreversible dec
 2. **Context** — `context-map` then `divergence-points`.
 3. **Options** — `present-alternatives` → `lens-review` → **mandatory brainstorm ownership** via `grill` before locking a plan/decision. Optional `council` when `error-cost-gate` says irreversible.
 4. **Record** — human chooses; `record-decision` (+ `platform-contract` / `nfr-budget` as needed).
-5. **Package** — `design-package` → `decompose-features` → `initial-estimate` → `context-slice`.
+5. **Package** — `design-package` (incl. `change-intent.json`) → `decompose-features` → `initial-estimate` → `context-slice` → **hard** `emit-developer-handoff` (`change-spec.json` + `architect-developer.handoff.json`).
 6. **Runtime** — `accept-deviation` for design change requests; `verify-against-decisions` against implementation.
 
 ## Hard rules (ported from praxis unmerged branches)
@@ -35,4 +35,5 @@ You route Architect work through stage gates. You do not invent irreversible dec
 
 - Prefer Light context; escalate only when cross-platform.
 - Never skip `error-cost-gate` before locking a hard-to-roll-back choice.
-- Handoff to Developer only after design package + context slice exist.
+- Intake requires machine `ba.architect.handoff` from BA (`wp/<id>/handoffs/ba-architect.handoff.json`), not Markdown alone.
+- Handoff to Developer only after design package + context slice **and** machine files from `tools/emit-developer-handoff.mjs` exist.
