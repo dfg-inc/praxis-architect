@@ -476,14 +476,29 @@ Developer applies change-spec; Quality verifies acceptanceChecks + handoff.
 
   const contextSlicePath = join(designDir, "context-slice.md");
   if (!existsSync(contextSlicePath)) {
+    const nfrLines = (designMeta.nfrBudgets ?? []).length
+      ? designMeta.nfrBudgets.map((x) => `- ${x}`).join("\n")
+      : "None";
+    const contractLines = (designMeta.contracts ?? []).length
+      ? designMeta.contracts.map((x) => `- ${x}`).join("\n")
+      : "None";
     writeFileSync(
       contextSlicePath,
       `# Context slice — ${ba.workPackageId}
 
 ## In slice
 
+### Decisions
+${(changeSpec.decisionIds ?? []).map((id) => `- ${id}`).join("\n") || "None"}
+
+### Contracts
+${contractLines}
+
+### NFR budgets
+${nfrLines}
+
+### Must-read
 ${inScope}
-- Requirements: ${ba.requirementIds.join(", ")}
 
 ## Out of slice
 
@@ -492,6 +507,10 @@ ${(designMeta.outOfScope ?? ["Unrelated product surfaces"]).map((x) => `- ${x}`)
 ## Non-negotiables
 
 - Apply change-spec only within allowed scope.
+
+## Open items
+
+None
 `,
     );
   }
