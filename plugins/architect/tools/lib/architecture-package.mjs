@@ -86,13 +86,46 @@ export function normalizeChangeSpec(rawSpec, ba, opts = {}) {
     }
   }
 
+  const normalizedChanges = spec.changes.map((c, i) => {
+    if (!c?.file) throw new Error(`changes[${i}] missing file`);
+    const op =
+      c.op ??
+      (c.content !== undefined || c.write !== undefined ? "create" : "edit");
+    if (op === "create") {
+      const content = c.content ?? c.write;
+      if (content === undefined) {
+        throw new Error(
+          `changes[${i}] (${c.file}): create requires content (or legacy write)`,
+        );
+      }
+      return {
+        file: c.file,
+        description: c.description,
+        op: "create",
+        content,
+      };
+    }
+    if (c.match === undefined || c.replace === undefined) {
+      throw new Error(
+        `changes[${i}] (${c.file}): edit requires match and replace`,
+      );
+    }
+    return {
+      file: c.file,
+      description: c.description,
+      op: "edit",
+      match: c.match,
+      replace: c.replace,
+    };
+  });
+
   const wpId = ba.workPackageId;
   const fromDesign = listDecisionIds(opts.designDir);
   const adrId = spec.decisionIds?.[0] ?? fromDesign[0] ?? `ADR-${wpId}`;
   const designMeta = spec.design ?? {};
   const productHint = opts.productHint;
 
-  return {
+  const changeSpec = {
     workPackageId: wpId,
     requirementIds: spec.requirementIds ?? ba.requirementIds,
     decisionIds: spec.decisionIds?.length
@@ -108,11 +141,157 @@ export function normalizeChangeSpec(rawSpec, ba, opts = {}) {
       "lib/**/*.js",
       "test/**/*.js",
     ],
-    changes: spec.changes,
-    acceptanceChecks: spec.acceptanceChecks ?? [],
+    changes: normalizedChanges,
+    acceptanceChecks: normalizeAcceptanceChecks(
+      spec.acceptanceChecks,
+      normalizedChanges,
+    ),
     features: spec.features,
     design: designMeta,
+    requiredMachineFiles: spec.requiredMachineFiles,
+    verificationPolicy: {
+      requireTests:
+        spec.verificationPolicy?.requireTests ??
+        inferRequireTests(normalizedChanges, spec.acceptanceChecks),
+      requireBuild: spec.verificationPolicy?.requireBuild ?? false,
+      requireLint: spec.verificationPolicy?.requireLint ?? false,
+    },
   };
+
+  assertMachineCompleteness(changeSpec, opts.designDir);
+  return changeSpec;
+}
+
+function inferRequireTests(changes, acceptanceChecks) {
+  if (
+    Array.isArray(acceptanceChecks) &&
+    acceptanceChecks.some((c) => c?.type === "npm-test")
+  ) {
+    return true;
+  }
+  return changes.some(
+    (c) =>
+      /(^|\/)test\//.test(c.file) ||
+      /\.test\.(js|mjs|cjs|ts)$/.test(c.file) ||
+      c.file === "package.json",
+  );
+}
+
+function normalizeAcceptanceChecks(raw, changes) {
+  if (Array.isArray(raw) && raw.length > 0) {
+    return raw.map((c) => {
+      if (c?.type === "npm-test") return { type: "npm-test" };
+      if (c?.file && c?.contains) {
+        return { type: "contains", file: c.file, contains: c.contains };
+      }
+      throw new Error(
+        "acceptanceChecks entries need {file,contains} or {type:'npm-test'}",
+      );
+    });
+  }
+  // Default: substring checks from edits + npm-test when test artifacts present
+  const checks = changes
+    .filter((c) => c.op === "edit" && c.replace)
+    .map((c) => ({
+      type: "contains",
+      file: c.file,
+      contains: c.replace,
+    }));
+  if (inferRequireTests(changes, raw)) {
+    checks.push({ type: "npm-test" });
+  }
+  return checks;
+}
+
+/**
+ * Extract paths the design package declares as **machine-required** work.
+ * In-slice / contextInScope alone is read-scope — not every path must be patched.
+ * Completeness keys off:
+ *   - change-spec.requiredMachineFiles
+ *   - design.machineRequirements / change-intent.requiredMachineFiles
+ *   - markdown `## Machine requirements` section
+ */
+export function collectRequiredMachineFiles(designDir, changeSpec) {
+  const required = new Set();
+  for (const f of changeSpec.requiredMachineFiles ?? []) {
+    if (typeof f === "string" && f.trim()) required.add(normalizeRelPath(f));
+  }
+  for (const x of changeSpec.design?.machineRequirements ?? []) {
+    for (const p of extractPathsFromText(String(x))) required.add(p);
+  }
+  if (!designDir || !existsSync(designDir)) return [...required];
+
+  for (const name of ["index.md", "context-slice.md", "design-package.md", "change-intent.json"]) {
+    const p = join(designDir, name);
+    if (!existsSync(p)) continue;
+    if (name.endsWith(".json")) {
+      try {
+        const j = JSON.parse(readFileSync(p, "utf8"));
+        for (const f of j.requiredMachineFiles ?? []) {
+          if (typeof f === "string") required.add(normalizeRelPath(f));
+        }
+        for (const x of j.design?.machineRequirements ?? []) {
+          for (const path of extractPathsFromText(String(x))) required.add(path);
+        }
+      } catch {
+        /* ignore */
+      }
+      continue;
+    }
+    const body = readFileSync(p, "utf8");
+    const section = body.match(
+      /##\s*Machine requirements\b([\s\S]*?)(?=\n##\s|\n?$)/i,
+    )?.[1];
+    if (section) {
+      for (const path of extractPathsFromText(section)) required.add(path);
+    }
+  }
+  return [...required];
+}
+
+function normalizeRelPath(p) {
+  return p
+    .trim()
+    .replace(/^`+|`+$/g, "")
+    .replace(/^\.\//, "")
+    .split("\\")
+    .join("/");
+}
+
+function extractPathsFromText(text) {
+  const out = new Set();
+  // Backtick paths and plain path-looking tokens with a slash or known roots
+  for (const m of text.matchAll(
+    /`((?:src|lib|test|scripts|tools)\/[^`\s]+|package\.json|[^\s`]+\.(?:js|mjs|cjs|ts|json))`/g,
+  )) {
+    out.add(normalizeRelPath(m[1]));
+  }
+  for (const m of text.matchAll(
+    /(?<![`\w])((?:src|lib|test|scripts)\/[\w./-]+\.(?:js|mjs|cjs|ts|json)|package\.json)(?![`\w])/g,
+  )) {
+    out.add(normalizeRelPath(m[1]));
+  }
+  return [...out];
+}
+
+/**
+ * Refuse readyForDev machine emit when design requires files not covered by changes.
+ */
+export function assertMachineCompleteness(changeSpec, designDir) {
+  const covered = new Set(changeSpec.changes.map((c) => normalizeRelPath(c.file)));
+  const required = collectRequiredMachineFiles(designDir, changeSpec);
+  const missing = required.filter((f) => !covered.has(f));
+  if (missing.length) {
+    throw new Error(
+      `change-spec incomplete for readyForDev: design requires [${missing.join(", ")}] ` +
+        `but changes only cover [${[...covered].join(", ")}]. ` +
+        "Add edit/create operations for every required machine file.",
+    );
+  }
+  // Any create/edit must be well-formed (already normalized).
+  if (!changeSpec.features.every((f) => f.readyForDev === true)) {
+    throw new Error("cannot emit: not all features readyForDev:true");
+  }
 }
 
 /**

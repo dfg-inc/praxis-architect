@@ -85,14 +85,21 @@ Project may relocate under `.project` `design.root`; default is `design/<workPac
    {
      "decisionIds": ["ADR-…"],
      "requirementIds": ["…from ba handoff…"],
+     "requiredMachineFiles": ["src/…", "package.json", "test/….test.js"],
      "features": [{ "id": "FEAT-…", "title": "…", "readyForDev": true }],
      "changes": [
-       { "file": "path/in/product", "description": "…", "match": "…", "replace": "…" }
+       { "file": "path/existing.js", "op": "edit", "description": "…", "match": "…", "replace": "…" },
+       { "file": "path/new.test.js", "op": "create", "description": "…", "content": "…" }
      ],
-     "acceptanceChecks": [{ "file": "…", "contains": "…" }],
+     "acceptanceChecks": [
+       { "file": "…", "contains": "…" },
+       { "type": "npm-test" }
+     ],
+     "verificationPolicy": { "requireTests": true },
      "design": {
        "title": "…",
        "decision": "…",
+       "machineRequirements": ["src/…", "package.json", "test/…"],
        "contextInScope": ["…"],
        "outOfScope": ["…"],
        "changeIntent": "one-liner"
@@ -100,7 +107,10 @@ Project may relocate under `.project` `design.root`; default is `design/<workPac
    }
    ```
 
-   `changes` may use `match`/`replace` or `write` for new files. Omit empty — handoff emit will fail.
+   - `op: "edit"` (default): deterministic `match`→`replace` on an existing file.
+   - `op: "create"`: full file `content` (legacy `write` still accepted). Idempotent if content already matches; **fails** on conflicting existing content.
+   - Every path in `requiredMachineFiles` / `## Machine requirements` / `design.machineRequirements` **must** appear in `changes[].file` or `emit-developer-handoff` refuses `readyForDev`.
+   - Do not leave required implementation only in Markdown.
 
 10. **Self-check**  
    - Every diagram renders as text in a markdown viewer.  

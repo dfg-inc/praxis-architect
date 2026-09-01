@@ -83,7 +83,7 @@ This path becomes `contextSlicePath` on `architect.developer.handoff`.
 
 5. **Emit machine handoff (hard gate — do not skip)**  
 
-   Ensure `design/<workPackageId>/change-intent.json` exists (from `design-package` / decompose) with non-empty `changes` and features `readyForDev: true`. Then run:
+   Ensure `design/<workPackageId>/change-intent.json` exists (from `design-package` / decompose) with non-empty `changes` covering **every** `requiredMachineFiles` / `## Machine requirements` entry (edit **and** create ops as needed) and features `readyForDev: true`. Then run:
 
    ```
    node ${CLAUDE_PLUGIN_ROOT}/tools/emit-developer-handoff.mjs \
