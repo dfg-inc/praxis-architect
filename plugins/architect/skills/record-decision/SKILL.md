@@ -39,7 +39,7 @@ Copy from `plugins/architect/templates/architecture-decision.md`:
 ## Steps
 
 1. **Preflight gates**  
-   - If `error-cost-gate` = `council-required`, require `architecture/.../council-verdict*` (or session-linked path) + recorded human choice. Else refuse.  
+   - If `error-cost-gate` = `council-required`, require a machine council outcome + recorded human choice (`architecture-governance.mjs assert-record-decision`). Else refuse.  
    - Confirm human choice is explicit (not inferred from silence).
 
 2. **Mint id**  

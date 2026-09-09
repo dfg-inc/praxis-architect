@@ -93,6 +93,14 @@ If multi-agent orchestration is unavailable:
    - `## Recommended path`
    - Appendix: round notes (optional / collapsible)
 
+   Also persist the machine outcome:
+
+   ```bash
+   node ${CLAUDE_PLUGIN_ROOT}/tools/architecture-governance.mjs record-council --in <json> --out design/<wp>/council/<id>.json
+   ```
+
+   Approved outcomes require `humanApproval.actor`. Council never self-approves or writes an ADR.
+
 5. **Human gate (required)** — AskUserQuestion with the verdict and the concrete options. Wait for explicit choice (option id / hybrid / reject-all).
 6. Record human choice on the verdict file under `## Human decision` (date + choice + rationale if given).
 7. Hand off to `record-decision` with chosen + rejected sets. Do not write the ADR inside this skill.

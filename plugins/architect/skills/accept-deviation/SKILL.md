@@ -23,6 +23,16 @@ Route Developer deviation requests through Architect change control — not sile
 3. Update or supersede decision record; refresh context slice if needed.
 4. Accept or reject with rationale.
 
+## Machine artifact
+
+Developer files JSON via `tools/request-architecture-deviation.mjs`. Architect decides without editing the original ADR:
+
+```bash
+node ${CLAUDE_PLUGIN_ROOT}/tools/architecture-governance.mjs decide-deviation --request <req.json> --outcome approved|rejected|revise --actor <role> --rationale <text> --adr <original.md> --out <decision.json>
+```
+
+Binding changes require an explicit `--new-decision-id` (new ADR), never a silent rewrite of the original.
+
 ## Outputs
 
 - Updated decision / rejection note; notify Developer

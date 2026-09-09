@@ -22,6 +22,14 @@ Rough sizing for planning — not a commitment until human accepts.
 2. Propose build order (critical path first).
 3. Call out estimate risk drivers.
 
+## Machine artifact
+
+```bash
+node ${CLAUDE_PLUGIN_ROOT}/tools/architecture-governance.mjs build-plan --in <units.json>
+```
+
+Units use `estimateHours` (existing feature estimate field) plus `dependsOn`. Output order is deterministic; independent units share a parallelizable wave.
+
 ## Outputs
 
 - Estimate table + build order (feeds Jira `setArchitectEstimate` when used)

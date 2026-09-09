@@ -75,6 +75,14 @@ Council may run; it is not a hard block on `record-decision` if the human explic
    - Rationale (≤10 lines)
    - Next skill: `council` | `record-decision` | human waive path
 
+   Machine gate (deterministic flags, no LLM):
+
+   ```bash
+   node ${CLAUDE_PLUGIN_ROOT}/tools/architecture-governance.mjs classify-error-cost --in <flags.json>
+   ```
+
+   `priceOfError: high` → `council-required` and `record-decision` is blocked until council + human approval exist.
+
 4. If `council-required` → invoke `council`; do not call `record-decision` yet.
 5. If `skip` → proceed to human choice confirmation, then `record-decision`.
 6. If `council-optional` → AskUserQuestion: run council or waive? Record the answer on the artifact.

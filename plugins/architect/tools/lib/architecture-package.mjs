@@ -11,6 +11,7 @@ import {
   writeFileSync,
 } from "node:fs";
 import { dirname, join, relative } from "node:path";
+import { listPlatformContractIds, detectMissingPlatformContracts } from "./architecture-governance.mjs";
 
 /**
  * @typedef {{
@@ -29,7 +30,8 @@ import { dirname, join, relative } from "node:path";
  *   id: string,
  *   title: string,
  *   readyForDev: boolean,
- *   estimateHours?: number
+ *   estimateHours?: number,
+ *   dependsOn?: string[]
  * }} Feature
  */
 
@@ -421,6 +423,7 @@ export function writeMachineArtifacts(designDir, outRoot, opts) {
   const changeSpecPath = join(designDir, "change-spec.json");
   writeFileSync(changeSpecPath, `${JSON.stringify(changeSpec, null, 2)}\n`);
 
+  const platformContractIds = listPlatformContractIds(designDir);
   const handoff = {
     contract: "architect.developer.handoff",
     version: "0.1.0",
@@ -431,6 +434,7 @@ export function writeMachineArtifacts(designDir, outRoot, opts) {
     decisionIds: changeSpec.decisionIds,
     features: changeSpec.features,
   };
+  if (platformContractIds.length) handoff.platformContractIds = platformContractIds;
   const handoffPath = join(designDir, "architect-developer.handoff.json");
   writeFileSync(handoffPath, `${JSON.stringify(handoff, null, 2)}\n`);
 
@@ -605,6 +609,15 @@ export function emitDeveloperHandoff(opts) {
     changeSpecPath,
     productHint,
   });
+  const required = changeSpec.design?.requiredContracts ?? [];
+  if (Array.isArray(required) && required.length) {
+    const { missing } = detectMissingPlatformContracts(designDir, required);
+    if (missing.length) {
+      throw new Error(
+        `missing required platform contracts: ${missing.join(", ")} (will not invent them)`,
+      );
+    }
+  }
   const machine = writeMachineArtifacts(designDir, outRoot, { ba, changeSpec });
   return { designDir, source, ...machine };
 }

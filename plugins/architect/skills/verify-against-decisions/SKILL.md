@@ -22,6 +22,14 @@ Before merge, check that code and design still match binding decisions and NFR l
 2. For each budget: measurement or honest "not yet measured" with plan.
 3. Fail closed on silent violations.
 
+## Machine report
+
+```bash
+node ${CLAUDE_PLUGIN_ROOT}/tools/architecture-governance.mjs conformance --in <spec.json>
+```
+
+Bindings use explicit `contains` checks. Unauthorized mismatches fail with the decision/contract id. An approved deviation is referenced and is not an unauthorized violation.
+
 ## Outputs
 
 - Verification report pass/fail

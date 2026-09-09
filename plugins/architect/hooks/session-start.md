@@ -4,14 +4,10 @@ At the beginning of an Architect session, run the bootstrap script so role/stage
 rules and `.project` status are visible before other skills:
 
 ```
-node ${CLAUDE_PLUGIN_ROOT}/tools/session-bootstrap.mjs --repo .
+node ${CLAUDE_PLUGIN_ROOT}/tools/session-bootstrap.mjs [repo-root]
 ```
 
-Optional stage override (default `plan`):
-
-```
-node ${CLAUDE_PLUGIN_ROOT}/tools/session-bootstrap.mjs --repo . --stage plan
-```
+Positional repo root wins over CWD. `--repo` is accepted when no positional is given. Optional `--stage` (default `plan`).
 
 Equivalent skill: `session-start`. Role `architect`, stage `plan` by default.
 Uses shared `@praxis/plugin-sdk.bootstrapSession()` (bundled into

@@ -23,6 +23,14 @@ Make inter-platform expectations explicit: interfaces, versioning, compatibility
 3. Compatibility policy: additive-only, deprecation window, break process.
 4. Link to decision ids.
 
+## Machine artifact
+
+```bash
+node ${CLAUDE_PLUGIN_ROOT}/tools/architecture-governance.mjs write-platform-contract --in <json> --out design/<wp>/contracts/<id>.json
+```
+
+JSON must include id, owner, consumers, request, response, errors, compatibility.version. Missing required ids are detected (`detect-missing-contracts`) and never invented. Developer handoff lists `platformContractIds` when contract files exist.
+
 ## Outputs
 
 - Contract document path
