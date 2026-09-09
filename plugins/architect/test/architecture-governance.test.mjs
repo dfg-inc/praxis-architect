@@ -10,10 +10,17 @@ import {
   decideDeviation,
   detectMissingPlatformContracts,
   evaluateConformance,
+  normalizeArchitectureDecision,
+  normalizeNfrBudget,
   normalizePlatformContract,
   persistArtifact,
+  presentAlternatives,
   recordCouncilOutcome,
   submitDeviationRequest,
+  intakeAudit,
+  buildContextMap,
+  findDivergencePoints,
+  lensReview,
 } from "../tools/lib/architecture-governance.mjs";
 
 const dirs = [];
@@ -268,5 +275,77 @@ describe("conformance (4.16)", () => {
     expect(r.deviations).toEqual([]);
     expect(r.authorizedDeviations[0].id).toBe("ADR-001");
     expect(r.authorizedDeviations[0].deviationId).toBe("DEV-1-decision");
+  });
+});
+
+describe("4.1–4.5 / 4.8 / 4.10 machine gates", () => {
+  it("returns a contradictory package to BA", () => {
+    const r = intakeAudit({
+      workPackageId: "WP-1",
+      requirements: [
+        { id: "FR-1", hasAcceptanceCriteria: true, feasible: true },
+        { id: "FR-2", hasAcceptanceCriteria: true, feasible: true },
+      ],
+      contradictions: [{ a: "FR-1", b: "FR-2", reason: "must store vs must not store PII" }],
+    });
+    expect(r.accepted).toBe(false);
+    expect(r.returnTo).toBe("ba");
+  });
+
+  it("maps platforms to decision files", () => {
+    const m = buildContextMap({
+      workPackageId: "WP-1",
+      platforms: [{ name: "billing", decisions: [{ id: "ADR-1", path: "architecture/ADR-1.md" }] }],
+    });
+    expect(m.platforms[0].decisions[0].path).toContain("ADR-1.md");
+  });
+
+  it("names unfixed exchange formats as divergence points", () => {
+    const d = findDivergencePoints({
+      exchanges: [{ from: "A", to: "B", formatFixed: false }],
+    });
+    expect(d.points[0].requiredDecision).toMatch(/A↔B/);
+  });
+
+  it("requires two alternatives with ops impact", () => {
+    const a = presentAlternatives({
+      decisionId: "ADR-2",
+      options: [
+        { id: "sql", cost: "low", risks: "lock-in", operations: "backup job" },
+        { id: "kv", cost: "mid", risks: "consistency", operations: "ttl" },
+      ],
+    });
+    expect(a.options).toHaveLength(2);
+  });
+
+  it("runs five lenses before choice", () => {
+    const L = { verdict: "ok", weakness: "" };
+    const r = lensReview({
+      optionId: "sql",
+      lenses: {
+        reliability: L,
+        security: { verdict: "weak", weakness: "no encryption at rest" },
+        cost: L,
+        operations: L,
+        migration: L,
+      },
+    });
+    expect(r.weakLenses).toContain("security");
+  });
+
+  it("marks incomplete architecture decisions", () => {
+    const r = normalizeArchitectureDecision({ id: "ADR-3", bindingScope: "svc" });
+    expect(r.complete).toBe(false);
+    expect(r.missing).toContain("rejectedAlternatives");
+  });
+
+  it("records NFR budget verify how/when", () => {
+    const b = normalizeNfrBudget({
+      metric: "p95 latency",
+      limit: "200ms",
+      verifyHow: "load test",
+      verifyWhen: "pre-release",
+    });
+    expect(b.verifyWhen).toBe("pre-release");
   });
 });

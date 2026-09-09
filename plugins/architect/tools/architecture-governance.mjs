@@ -14,10 +14,17 @@ import {
   evaluateConformance,
   listPlatformContractIds,
   loadArtifact,
+  normalizeArchitectureDecision,
+  normalizeNfrBudget,
   normalizePlatformContract,
   persistArtifact,
+  presentAlternatives,
   recordCouncilOutcome,
   submitDeviationRequest,
+  intakeAudit,
+  buildContextMap,
+  findDivergencePoints,
+  lensReview,
 } from "./lib/architecture-governance.mjs";
 
 const args = process.argv.slice(2);
@@ -46,7 +53,7 @@ function maybeOut(obj) {
 
 if (!verb) {
   fail(
-    "usage: architecture-governance.mjs <classify-error-cost|record-council|assert-record-decision|write-platform-contract|list-platform-contracts|detect-missing-contracts|build-plan|submit-deviation|decide-deviation|conformance>",
+    "usage: architecture-governance.mjs <classify-error-cost|record-council|assert-record-decision|write-platform-contract|list-platform-contracts|detect-missing-contracts|build-plan|submit-deviation|decide-deviation|conformance|intake-audit|context-map|divergence-points|alternatives|lens-review|record-decision|nfr-budget>",
   );
 }
 
@@ -105,6 +112,20 @@ try {
     console.log(JSON.stringify(decision, null, 2));
   } else if (verb === "conformance") {
     maybeOut(evaluateConformance(loadIn()));
+  } else if (verb === "intake-audit") {
+    maybeOut(intakeAudit(loadIn()));
+  } else if (verb === "context-map") {
+    maybeOut(buildContextMap(loadIn()));
+  } else if (verb === "divergence-points") {
+    maybeOut(findDivergencePoints(loadIn()));
+  } else if (verb === "alternatives") {
+    maybeOut(presentAlternatives(loadIn()));
+  } else if (verb === "lens-review") {
+    maybeOut(lensReview(loadIn()));
+  } else if (verb === "record-decision") {
+    maybeOut(normalizeArchitectureDecision(loadIn()));
+  } else if (verb === "nfr-budget") {
+    maybeOut(normalizeNfrBudget(loadIn()));
   } else {
     fail(`unknown verb ${verb}`);
   }

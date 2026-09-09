@@ -434,6 +434,154 @@ export function evaluateConformance(opts) {
   };
 }
 
+/** WBS 4.1 — structured intake (no LLM). */
+export function intakeAudit(input) {
+  const items = Array.isArray(input?.requirements) ? input.requirements : [];
+  const axes = { completeness: [], contradictions: [], feasibility: [] };
+  for (const r of items) {
+    const id = mustString(r?.id, "requirement.id");
+    if (!r?.hasAcceptanceCriteria) {
+      axes.completeness.push(`${id}: missing acceptance criteria`);
+    }
+    if (r?.feasible === false) {
+      axes.feasibility.push(`${id}: ${r.feasibilityNote ?? "not feasible"}`);
+    }
+  }
+  for (const pair of input?.contradictions ?? []) {
+    axes.contradictions.push(
+      `${pair.a} incompatible with ${pair.b}: ${pair.reason ?? "unspecified"}`,
+    );
+  }
+  const returned = axes.contradictions.length > 0 || axes.feasibility.length > 0;
+  const complete = axes.completeness.length === 0;
+  return {
+    contract: "architect.intake.audit",
+    version: "0.1.0",
+    workPackageId: mustString(input?.workPackageId, "workPackageId"),
+    axes,
+    accepted: complete && !returned,
+    returnTo: returned ? "ba" : null,
+  };
+}
+
+/** WBS 4.2 */
+export function buildContextMap(input) {
+  const platforms = Array.isArray(input?.platforms) ? input.platforms : [];
+  if (!platforms.length) fail("platforms required");
+  return {
+    contract: "architect.context-map",
+    version: "0.1.0",
+    workPackageId: mustString(input?.workPackageId, "workPackageId"),
+    platforms: platforms.map((p) => ({
+      name: mustString(p.name, "platform.name"),
+      decisions: (p.decisions ?? []).map((d) => ({
+        id: mustString(d.id, "decision.id"),
+        path: mustString(d.path, "decision.path"),
+      })),
+    })),
+  };
+}
+
+/** WBS 4.3 */
+export function findDivergencePoints(input) {
+  const points = [];
+  for (const ex of input?.exchanges ?? []) {
+    if (!ex.formatFixed) {
+      points.push({
+        id: `DIV-${(points.length + 1).toString().padStart(3, "0")}`,
+        systems: [ex.from, ex.to],
+        consequence: "incompatible payloads / silent data loss",
+        requiredDecision: `fix exchange format ${ex.from}↔${ex.to}`,
+      });
+    }
+  }
+  return {
+    contract: "architect.divergence-points",
+    version: "0.1.0",
+    points,
+  };
+}
+
+/** WBS 4.4 */
+export function presentAlternatives(input) {
+  const options = Array.isArray(input?.options) ? input.options : [];
+  if (options.length < 2) fail("at least two alternatives required");
+  return {
+    contract: "architect.alternatives",
+    version: "0.1.0",
+    decisionId: mustString(input?.decisionId, "decisionId"),
+    options: options.map((o) => ({
+      id: mustString(o.id, "option.id"),
+      cost: mustString(o.cost, "option.cost"),
+      risks: mustString(o.risks, "option.risks"),
+      operations: mustString(o.operations, "option.operations"),
+    })),
+  };
+}
+
+const LENSES = ["reliability", "security", "cost", "operations", "migration"];
+
+/** WBS 4.5 */
+export function lensReview(input) {
+  const findings = {};
+  for (const lens of LENSES) {
+    const row = input?.lenses?.[lens];
+    if (!row || typeof row.verdict !== "string") {
+      fail(`lens ${lens} missing verdict`);
+    }
+    findings[lens] = {
+      verdict: row.verdict,
+      weakness: row.weakness ?? "",
+    };
+  }
+  return {
+    contract: "architect.lens-review",
+    version: "0.1.0",
+    optionId: mustString(input?.optionId, "optionId"),
+    findings,
+    weakLenses: LENSES.filter((l) => findings[l].weakness),
+  };
+}
+
+/** WBS 4.8 */
+export function normalizeArchitectureDecision(input) {
+  const missing = [];
+  if (!input?.bindingScope) missing.push("bindingScope");
+  if (!input?.preventsDivergence) missing.push("preventsDivergence");
+  if (!input?.ruleIntroduced) missing.push("ruleIntroduced");
+  if (!input?.rejectedAlternatives) missing.push("rejectedAlternatives");
+  if (missing.length) {
+    return {
+      contract: "architect.decision",
+      version: "0.1.0",
+      complete: false,
+      missing,
+    };
+  }
+  return {
+    contract: "architect.decision",
+    version: "0.1.0",
+    id: mustString(input.id, "id"),
+    complete: true,
+    bindingScope: input.bindingScope,
+    preventsDivergence: input.preventsDivergence,
+    ruleIntroduced: input.ruleIntroduced,
+    rejectedAlternatives: input.rejectedAlternatives,
+  };
+}
+
+/** WBS 4.10 */
+export function normalizeNfrBudget(input) {
+  return {
+    contract: "architect.nfr-budget",
+    version: "0.1.0",
+    metric: mustString(input?.metric, "metric"),
+    limit: mustString(String(input?.limit ?? ""), "limit"),
+    verifyHow: mustString(input?.verifyHow, "verifyHow"),
+    verifyWhen: mustString(input?.verifyWhen, "verifyWhen"),
+  };
+}
+
 export function persistArtifact(path, obj) {
   return writeJson(path, obj);
 }
