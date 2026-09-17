@@ -5,9 +5,9 @@ description: Read-only Architect/Jira status for an Epic and its work packages.
 
 # Architecture Status
 
-```
-praxis doctor --json
-praxis architect status --epic <EPIC> --json
-```
+Call MCP:
 
-Read-only. If CLI cannot run: `LOCAL_RUNTIME_UNAVAILABLE`.
+- `praxis_doctor`
+- `praxis_architect_status` with `epic`
+
+Read-only. No confirmation. If runtime cannot run: `LOCAL_RUNTIME_UNAVAILABLE`.

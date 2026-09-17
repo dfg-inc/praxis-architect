@@ -1,12 +1,10 @@
 # praxis-architect
 
-Claude Code plugin for the Architect role (WBS 4.1–4.16).
+Claude plugin for the Architect role.
 
-## Install
+**Claude UI / Cowork:** import `claude-plugins/praxis-architect.zip`. Requires a supported workspace with repository access and local Jira configuration. Speak to the Architect skill; operations run through MCP tools.
 
-Register via Claude Code marketplace or symlink this folder into your plugins path.
-
-## Skills
+**Claude Code / CI:** `praxis architect --help` or `make architect`.
 
 Intake → context map → divergence → alternatives → lens/council gates → decision records → design package → decompose → estimate → context slice → deviation accept → verify.
 

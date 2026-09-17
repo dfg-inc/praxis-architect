@@ -5,16 +5,10 @@ description: Read BA Jira handoff for an Epic, add technical design, create Work
 
 # Jira plan epic
 
-Public CLI only. If unsure: `praxis architect --help`.
+Use MCP tools.
 
-```
-praxis architect preview --epic PRX-1 --repo . --json
-```
+Call `praxis_architect_preview`. Apply only after human approval:
 
-Apply after human confirmation:
+`praxis_architect_apply` with `confirmation=YES` and matching `previewFingerprint`.
 
-```
-praxis architect apply --epic PRX-1 --repo . --confirm YES --json
-```
-
-Do not overwrite User Story / BA AC. Do not invent generic technical tasks.
+Do not overwrite User Story / BA AC. Do not invent generic technical tasks. Do not immediately apply after preview.
