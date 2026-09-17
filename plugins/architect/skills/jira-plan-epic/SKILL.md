@@ -5,4 +5,16 @@ description: Read BA Jira handoff for an Epic, add technical design, create Work
 
 # Jira plan epic
 
-Do not overwrite User Story / BA AC. Add architecture sections, Mermaid source, optional technical tasks linked to stories, Work Packages (`praxis-work-package` label if no WP issue type).
+Public CLI only. If unsure: `praxis architect --help`.
+
+```
+praxis architect preview --epic PRX-1 --repo . --json
+```
+
+Apply after human confirmation:
+
+```
+praxis architect apply --epic PRX-1 --repo . --confirm YES --json
+```
+
+Do not overwrite User Story / BA AC. Do not invent generic technical tasks.
