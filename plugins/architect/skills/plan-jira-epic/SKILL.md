@@ -5,13 +5,20 @@ description: Continue an Epic as Architect — design package and Jira Work Pack
 
 # Plan Jira Epic
 
-Primary human UX is Claude UI / Cowork with project access. Users should not run Make or CLI.
+Primary human UX is Claude UI / Cowork with project access. Users should not run Make, CLI, or `launchctl`.
 
-## Capability detection
+## Shared Praxis Runtime
 
-Resolve the repo. Call `praxis_doctor`. If execution is not available: `LOCAL_RUNTIME_UNAVAILABLE`. If the repo is missing: `REPOSITORY_UNAVAILABLE`. If Jira is not configured: `JIRA_CONFIG_UNAVAILABLE`. Do not pretend architecture ran. Never paste tokens into chat.
+This Skill uses tools from the **Praxis Runtime** Desktop Extension.
 
-If `.project` is missing: `praxis_project_init_preview`, show it, wait for approval, then `praxis_project_init_apply` with `confirmation=YES`.
+1. If `praxis_doctor` is not available: stop with `PRAXIS_RUNTIME_UNAVAILABLE`. Tell the user to install or enable the Praxis Runtime Desktop Extension. Do not instruct them to run CLI or edit config files.
+2. Call `praxis_doctor`.
+3. If Jira is not configured: stop with `JIRA_CONFIG_UNAVAILABLE` and the `missing` field list. Tell the user: Open Claude Desktop → Settings → Extensions → Praxis Runtime → Settings. Never request the token in chat.
+4. If `.project` is missing: `praxis_project_init_preview`, show it, wait for approval, then `praxis_project_init_apply` with `confirmation=YES`.
+
+Quality runtime unhealthy must not block Architect status/preview. Do not start the Quality service.
+
+Allowed tools: common/Jira/project + Architect/WP tools. Do not start Developer.
 
 ## Flow
 
@@ -30,6 +37,6 @@ Only after approval call `praxis_architect_apply` with:
 - `confirmation`: `YES`
 - `previewFingerprint`: exact fingerprint from preview
 
-Then verify postconditions. Do not start Developer.
+Then verify postconditions.
 
 Examples: «Продолжи PRX-123 как архитектор и подготовь пакеты реализации.» / “Continue PRX-123 as architect and prepare implementation packages.”
