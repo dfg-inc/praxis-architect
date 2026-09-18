@@ -16,6 +16,8 @@ This Skill uses tools from the **Praxis Runtime** Desktop Extension.
 
 Allowed tools: common/Jira/project + Architect/WP. Do not start Developer. Quality unhealthy does not block this Skill.
 
-Call `praxis_doctor` then `praxis_architect_preview`. Show the preview and wait for human approval.
+Call `praxis_doctor` then `praxis_work_package_list` / `praxis_architect_status`. Resolve the canonical local Work Package first and pass that id as `workPackageId` — it is the materialization scope, not a hint. Do not call `praxis_architect_preview` without `workPackageId` when the canonical WP is already known.
 
-Apply only with `praxis_architect_apply`, `confirmation=YES`, and matching `previewFingerprint`. Do not immediately apply after preview.
+Then `praxis_architect_preview` with `epic` and `workPackageId`. Show CREATE/UPDATE/LINK/IGNORED and wait for human approval.
+
+Apply only with `praxis_architect_apply` using the same `workPackageId`, `confirmation=YES`, and matching `previewFingerprint`. Do not immediately apply after preview.

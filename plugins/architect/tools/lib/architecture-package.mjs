@@ -124,7 +124,10 @@ export function normalizeChangeSpec(rawSpec, ba, opts = {}) {
   const wpId = ba.workPackageId;
   const fromDesign = listDecisionIds(opts.designDir);
   const adrId = spec.decisionIds?.[0] ?? fromDesign[0] ?? `ADR-${wpId}`;
-  const designMeta = spec.design ?? {};
+  const designMeta = { ...(spec.design ?? {}) };
+  if (!designMeta.title && spec.features[0]?.title) {
+    designMeta.title = spec.features[0].title;
+  }
   const productHint = opts.productHint;
 
   const changeSpec = {

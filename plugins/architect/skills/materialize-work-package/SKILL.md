@@ -17,6 +17,8 @@ Uses existing local WP identity (e.g. WP-20260914-002). Does not create `wp:PRX-
 
 Allowed tools: common/Jira/project + Architect/WP. Do not start Developer.
 
-Call `praxis_architect_preview`. Show CREATE/UPDATE/LINK/IGNORED. STOP and wait for human approval.
+Resolve the canonical local Work Package (e.g. WP-20260914-002). Pass it explicitly as `workPackageId` — this is the materialization scope, not a hint. Do not preview without `workPackageId` when the WP is already known.
 
-Then `praxis_architect_apply` with `confirmation=YES` and matching `previewFingerprint`. Do not immediately apply after preview.
+Call `praxis_architect_preview` with `epic` and `workPackageId`. Show CREATE/UPDATE/LINK/IGNORED. STOP and wait for human approval.
+
+Then `praxis_architect_apply` with the same `workPackageId`, `confirmation=YES`, and matching `previewFingerprint`. Do not immediately apply after preview.

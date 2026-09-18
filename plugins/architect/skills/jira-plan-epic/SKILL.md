@@ -15,8 +15,10 @@ This Skill uses tools from the **Praxis Runtime** Desktop Extension.
 
 Allowed tools: common/Jira/project + Architect/WP. Do not start Developer.
 
-Call `praxis_architect_preview`. Apply only after human approval:
+Resolve the canonical local Work Package first. Pass `workPackageId` explicitly to preview — it is the materialization scope, not a hint. Do not call `praxis_architect_preview` without `workPackageId` when the WP is already known.
 
-`praxis_architect_apply` with `confirmation=YES` and matching `previewFingerprint`.
+Call `praxis_architect_preview` with `epic` and `workPackageId`. Apply only after human approval:
+
+`praxis_architect_apply` with the same `workPackageId`, `confirmation=YES`, and matching `previewFingerprint`.
 
 Do not overwrite User Story / BA AC. Do not invent generic technical tasks. Do not immediately apply after preview.
