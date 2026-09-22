@@ -17,10 +17,11 @@ Governance **never packs raw `plugins/` trees** that still declare `file:vendor`
 
 ## CI
 
-Jobs: `validate`, `governance`, `pack_zip`.
+Jobs: `validate`, `governance`, `pack_zip`; on tag `v$version` → `publish_release`.
 
 **Required GitLab setting:** on `praxis-ba` and `praxis-developer` → Settings → CI/CD → Job token permissions → allow inbound from `praxis-architect`.
 
 ## Release
 
-Artifact `praxis-architect.zip` + `dist/zip-checksums.json`. Version independently of other products.
+Install from [GitLab Releases](https://gl.jetru.by/engineering/ai-tooling/praxis-architect/-/releases): `praxis-architect.zip` + `release-meta.json` (SHA-256, source SHA, compatibility). Tag pipeline publishes to Generic Package Registry. Version independently of other products.
+
