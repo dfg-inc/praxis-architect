@@ -1,0 +1,26 @@
+{
+  "name": "praxis-architect",
+  "private": true,
+  "version": "0.1.0-alpha.44",
+  "description": "Praxis Architect Skills plugin and praxis-architect.zip",
+  "workspaces": [
+    "plugins/*",
+    "tools/scripts"
+  ],
+  "scripts": {
+    "build": "npm run build --workspaces --if-present",
+    "test": "npm run test --workspaces --if-present",
+    "plugins:validate": "node tools/scripts/validate-plugins.mjs",
+    "pack:zip": "node tools/scripts/pack-claude-plugins.mjs --version 0.1.0-alpha.44",
+    "check:skill-cli": "node tools/scripts/check-skill-cli.mjs",
+    "check:boundaries": "node tools/scripts/check-boundaries.mjs",
+    "accept:claude-plugins": "node tools/scripts/claude-plugins-acceptance.mjs",
+    "accept:claude-hosted-plugins": "node tools/scripts/claude-hosted-plugins-acceptance.mjs",
+    "accept:architecture-governance": "node tools/scripts/architecture-governance-acceptance.mjs --rebuild",
+    "verify": "npm run test && npm run plugins:validate && npm run check:skill-cli && npm run check:boundaries && npm run pack:zip && npm run accept:claude-plugins && npm run accept:architecture-governance"
+  },
+  "engines": {
+    "node": ">=20"
+  },
+  "license": "Apache-2.0"
+}
