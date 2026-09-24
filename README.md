@@ -2,26 +2,25 @@
 
 Independent Praxis Architect Skills plugin. Distribution: **`praxis-architect.zip`**.
 
-## Development
+## Clone / develop
 
 ```bash
+git clone https://github.com/dfg-inc/praxis-architect.git
+cd praxis-architect
 npm ci
-# For architecture governance across roles (local):
+# Optional: sibling checkouts for cross-role governance
 export PRAXIS_BA_ROOT=/path/to/praxis-ba
 export PRAXIS_DEVELOPER_ROOT=/path/to/praxis-developer
 export PRAXIS_ARCHITECT_ROOT=$PWD
 npm run verify
 ```
 
-Governance **never packs raw `plugins/` trees** that still declare `file:vendor` deps. Missing sibling `dist/release-mirror` trees are auto-staged.
+Governance uses pack-safe staged mirrors (never raw `file:vendor` plugin trees). CI checks out public sibling `dfg-inc` repositories — no private job tokens.
 
-## CI
+## Install
 
-Jobs: `validate`, `governance`, `pack_zip`; on tag `v$version` → `publish_release`.
-
-**Required GitLab setting:** on `praxis-ba` and `praxis-developer` → Settings → CI/CD → Job token permissions → allow inbound from `praxis-architect`.
+[Releases](https://github.com/dfg-inc/praxis-architect/releases): `praxis-architect.zip` + `release-meta.json`.
 
 ## Release
 
-Install from [GitLab Releases](https://gl.jetru.by/engineering/ai-tooling/praxis-architect/-/releases): `praxis-architect.zip` + `release-meta.json` (SHA-256, source SHA, compatibility). Tag pipeline publishes to Generic Package Registry. Version independently of other products.
-
+Tag `v$version` → GitHub Actions publishes the ZIP to a GitHub Release. Version independently of other products.
