@@ -1,6 +1,6 @@
 {
   "name": "@praxis/architect",
-  "version": "0.1.0-alpha.46",
+  "version": "0.1.0-alpha.47",
   "private": true,
   "description": "praxis-architect Claude Code plugin",
   "license": "Apache-2.0",
@@ -12,7 +12,7 @@
     "test": "vitest run"
   },
   "dependencies": {
-    "@praxis/plugin-sdk": "file:../../vendor/praxis-plugin-sdk-0.1.0-alpha.44.tgz"
+    "@praxis/plugin-sdk": "file:../../vendor/praxis-plugin-sdk-0.1.0-alpha.47.tgz"
   },
   "devDependencies": {
     "vitest": "^3.2.4"
