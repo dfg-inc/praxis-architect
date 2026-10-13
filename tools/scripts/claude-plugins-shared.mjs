@@ -11,6 +11,7 @@ export const PLUGINS = [
       "resume-architecture",
       "materialize-work-package",
       "architecture-status",
+      "local-workflow",
     ],
     helpCommands: [
       ["architect", "--help"],

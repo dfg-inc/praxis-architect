@@ -26,6 +26,7 @@ const UI_SKILLS = {
     "resume-architecture",
     "materialize-work-package",
     "architecture-status",
+    "local-workflow",
     "jira-plan-epic",
   ],
   developer: [

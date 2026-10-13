@@ -14,7 +14,7 @@ description: Continue architecture from local BA requirements without Jira. Use 
 
 ## Behavior
 
-Map requirements to services. A monolith stays one service. Multiple repositories stay explicit. Do not mark the feature ready because one service is ready.
+Map requirements to services with `set-service`, including `dependsOn`. Record confirmed architecture decisions with `record-decision`. A monolith stays one service. Multiple repositories stay explicit. Do not mark the feature ready because one service is ready.
 
 If a missing business decision changes behavior, create a handoff back to BA (`sourceRole=architect`, `targetRole=ba`) with the open question. Do not guess the policy.
 
