@@ -11,6 +11,8 @@ import {
   detectMissingPlatformContracts,
   evaluateConformance,
   normalizeArchitectureDecision,
+  exportDecisionSnapshot,
+  renderDecisionSnapshotHtml,
   normalizeNfrBudget,
   normalizePlatformContract,
   persistArtifact,
@@ -347,5 +349,40 @@ describe("4.1–4.5 / 4.8 / 4.10 machine gates", () => {
       verifyWhen: "pre-release",
     });
     expect(b.verifyWhen).toBe("pre-release");
+  });
+
+  it("keeps open questions, rationales, and notes in the snapshot", () => {
+    const base = {
+      bindingScope: "service",
+      preventsDivergence: "one schema",
+      ruleIntroduced: "validate before write",
+      rejectedAlternatives: ["implicit empty"],
+    };
+    const rationales = ["r1", "r2", "r3", "r4", "r5"];
+    const decisions = Array.from({ length: 9 }, (_, index) => ({
+      id: `DEC-${String(index + 1).padStart(3, "0")}`,
+      ...base,
+      rationale: rationales[index % rationales.length],
+      confirmed: index < 9,
+    }));
+    const snapshot = exportDecisionSnapshot({
+      decisions,
+      openQuestions: ["Who owns retries?", "Which tenant is in scope?"],
+      risks: ["partial export"],
+      blockers: ["missing owner"],
+      notes: "beta notes stay",
+    });
+    expect(snapshot.complete).toBe(true);
+    expect(snapshot.decisions).toHaveLength(9);
+    expect(new Set(snapshot.decisions.map((d) => d.rationale)).size).toBe(5);
+    expect(snapshot.openQuestions).toHaveLength(2);
+    expect(snapshot.notes).toBe("beta notes stay");
+    const html = renderDecisionSnapshotHtml(snapshot);
+    expect(html).toContain("Who owns retries?");
+    expect(html).toContain("beta notes stay");
+    expect(html).toContain("r5");
+    const dropped = exportDecisionSnapshot({ decisions, risks: [], blockers: [] });
+    expect(dropped.complete).toBe(false);
+    expect(dropped.missing).toEqual(expect.arrayContaining(["openQuestions", "notes"]));
   });
 });

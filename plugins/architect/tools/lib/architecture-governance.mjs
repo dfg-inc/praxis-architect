@@ -558,7 +558,7 @@ export function normalizeArchitectureDecision(input) {
       missing,
     };
   }
-  return {
+  const record = {
     contract: "architect.decision",
     version: "0.1.0",
     id: mustString(input.id, "id"),
@@ -568,6 +568,41 @@ export function normalizeArchitectureDecision(input) {
     ruleIntroduced: input.ruleIntroduced,
     rejectedAlternatives: input.rejectedAlternatives,
   };
+  for (const key of ["rationale", "notes", "openQuestions", "risks", "blockers"]) {
+    if (input[key] !== undefined) record[key] = input[key];
+  }
+  return record;
+}
+
+export function exportDecisionSnapshot(input) {
+  const missing = [];
+  if (!Array.isArray(input?.decisions)) missing.push("decisions");
+  if (!Array.isArray(input?.openQuestions)) missing.push("openQuestions");
+  if (input?.notes === undefined) missing.push("notes");
+  if (missing.length) {
+    return { contract: "architect.decision-snapshot", version: "0.1.0", complete: false, missing };
+  }
+  return {
+    contract: "architect.decision-snapshot",
+    version: "0.1.0",
+    complete: true,
+    decisions: input.decisions.map((decision) => normalizeArchitectureDecision(decision)),
+    openQuestions: input.openQuestions,
+    risks: input.risks === undefined ? null : input.risks,
+    blockers: input.blockers === undefined ? null : input.blockers,
+    notes: input.notes,
+  };
+}
+
+export function renderDecisionSnapshotHtml(snapshot) {
+  if (!snapshot?.complete) {
+    throw new Error(`incomplete snapshot: ${(snapshot?.missing ?? []).join(",")}`);
+  }
+  const decisions = snapshot.decisions
+    .map((decision) => `<li>${decision.id} ${decision.rationale ?? ""} ${decision.notes ?? ""}</li>`)
+    .join("");
+  const questions = snapshot.openQuestions.map((item) => `<li>${item}</li>`).join("");
+  return `<section><ul>${decisions}</ul><ul>${questions}</ul><p>${snapshot.notes}</p></section>`;
 }
 
 /** WBS 4.10 */
