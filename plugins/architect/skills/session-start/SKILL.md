@@ -5,7 +5,7 @@ description: Use at the start of an Architect session — runs session bootstrap
 
 # Session start
 
-Load `.project` defaults, the applicable knowledge rules for role `architect`, stage `plan` (override with `stage`; not for quality), and the Work Items of this repository. Does not mutate design packages or canon.
+Load `.project` defaults, the applicable knowledge rules for role `architect`, stage `plan` (override with `stage`), and the Work Items of this repository. Does not mutate design packages or canon.
 
 ## What happens
 
