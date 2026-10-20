@@ -23,3 +23,7 @@ Preview with `praxis_workflow_preview` and wait for approval before `praxis_work
 Forward handoff uses `targetRole=developer` and preserves requirement ids.
 
 Call `praxis_capabilities` for BA clarification or Quality consistency guidance. Do not execute external mutations from a suggestion.
+
+## Inspect stored work
+
+When the user asks what exists ("show requirements, Stories, architecture decisions, current work and Quality results"), call `praxis_workflow_inspect` (read-only; no Jira needed). Start with `view: "overview"`, then `requirements`, `stories`, `decisions`, `work`, `handoffs`, `open-items` or `quality`, or `all`. Pass `workItemId` when several Work Items exist, and `id` for one record. Report what it returns, including Story confirmation state: an unconfirmed Story stays unconfirmed. Do not ask the user to open files for anything Runtime can return.
