@@ -1,0 +1,220 @@
+{
+  "contract": "praxis.workflow.state",
+  "version": "1.0.0",
+  "workflowId": "WF-WI-MULTIPLE-INDEPENDENT-WOR-001",
+  "projectId": "praxis-runtime",
+  "workItem": {
+    "id": "WI-MULTIPLE-INDEPENDENT-WOR-001",
+    "projectId": "praxis-runtime",
+    "title": "Multiple independent work items per repository",
+    "source": "repository",
+    "status": "in_progress",
+    "revision": 2
+  },
+  "requirements": [
+    {
+      "id": "REQ-MWI-001",
+      "statement": "A repository must hold many independent work items, each with its own id, state, history, handoffs, stories, evidence and verdicts, with one explicitly selected current item and no accidental overwrite between items.",
+      "revision": 1,
+      "status": "proposed",
+      "acceptanceCriteria": [
+        {
+          "id": "REQ-MWI-001-AC-01",
+          "requirementId": "REQ-MWI-001",
+          "statement": "Opening a work item whose title matches an existing item's id slug but differs in identity creates a new item with the next sequence id and does not touch the first; opening the same item again selects it and reports duplicate without a second copy.",
+          "revision": 1
+        },
+        {
+          "id": "REQ-MWI-001-AC-02",
+          "requirementId": "REQ-MWI-001",
+          "statement": "Every workflow tool accepts an optional workItemId; omitted means the current item; an unknown workItemId fails with WORK_ITEM_NOT_FOUND and never falls back to the current item.",
+          "revision": 1
+        },
+        {
+          "id": "REQ-MWI-001-AC-03",
+          "requirementId": "REQ-MWI-001",
+          "statement": "A new item becomes current; selecting another item is an explicit, approved command; status lists all items and marks the current one.",
+          "revision": 1
+        },
+        {
+          "id": "REQ-MWI-001-AC-04",
+          "requirementId": "REQ-MWI-001",
+          "statement": "Handoffs, stories, coverage and verdicts of one item are never visible in or modified by commands on another.",
+          "revision": 1
+        },
+        {
+          "id": "REQ-MWI-001-AC-05",
+          "requirementId": "REQ-MWI-001",
+          "statement": "Concurrent writers to the same repository do not lose updates (locked read-modify-write, atomic file replace).",
+          "revision": 1
+        },
+        {
+          "id": "REQ-MWI-001-AC-06",
+          "requirementId": "REQ-MWI-001",
+          "statement": "A work item can reference work items in other repositories (repository, workItemId, relation) with a link-work-item command.",
+          "revision": 1
+        },
+        {
+          "id": "REQ-MWI-001-AC-07",
+          "requirementId": "REQ-MWI-001",
+          "statement": "A repository with the legacy single state.json is read unchanged, migrated to the new layout on first write, and an older runtime fails loudly instead of silently diverging.",
+          "revision": 1
+        },
+        {
+          "id": "REQ-MWI-001-AC-08",
+          "requirementId": "REQ-MWI-001",
+          "statement": "Quality checks may be scoped per work item and verify-stories/quality-check operate on the addressed item.",
+          "revision": 1
+        },
+        {
+          "id": "REQ-MWI-001-AC-09",
+          "requirementId": "REQ-MWI-001",
+          "statement": "Regressions run through real MCP workflow tools, including a migration test from a legacy state file.",
+          "revision": 1
+        }
+      ],
+      "serviceIds": [
+        "praxis-core-contracts",
+        "praxis-runtime-mcp"
+      ],
+      "assumptionIds": []
+    }
+  ],
+  "services": [],
+  "handoffs": [
+    {
+      "contract": "praxis.role.handoff",
+      "version": "1.0.0",
+      "workflowId": "WF-WI-MULTIPLE-INDEPENDENT-WOR-001",
+      "workItemId": "WI-MULTIPLE-INDEPENDENT-WOR-001",
+      "handoffId": "HO-1",
+      "sourceRole": "ba",
+      "targetRole": "architect",
+      "serviceIds": [
+        "praxis-core-contracts",
+        "praxis-runtime-mcp"
+      ],
+      "requirementIds": [
+        "REQ-MWI-001"
+      ],
+      "acceptanceCriterionIds": [
+        "REQ-MWI-001-AC-01",
+        "REQ-MWI-001-AC-02",
+        "REQ-MWI-001-AC-03",
+        "REQ-MWI-001-AC-04",
+        "REQ-MWI-001-AC-05",
+        "REQ-MWI-001-AC-06",
+        "REQ-MWI-001-AC-07",
+        "REQ-MWI-001-AC-08",
+        "REQ-MWI-001-AC-09"
+      ],
+      "storyIds": [],
+      "artifactRefs": [],
+      "decisions": [],
+      "assumptions": [],
+      "openQuestions": [
+        "What makes two open commands the same work item? Proposed: same projectId, title and jiraIssueKey."
+      ],
+      "risks": [],
+      "blockers": [],
+      "decisionRecords": [],
+      "resolved": [],
+      "nextActions": [],
+      "readiness": "ready",
+      "evidenceRefs": [],
+      "revision": 1,
+      "fingerprint": "sha256:34d6ed35b23bd7f26aa0e63030cb24b7dd03c222d6f327b238fd21f5cebd3f39"
+    },
+    {
+      "contract": "praxis.role.handoff",
+      "version": "1.0.0",
+      "workflowId": "WF-WI-MULTIPLE-INDEPENDENT-WOR-001",
+      "workItemId": "WI-MULTIPLE-INDEPENDENT-WOR-001",
+      "handoffId": "HO-2",
+      "sourceRole": "architect",
+      "targetRole": "developer",
+      "serviceIds": [
+        "praxis-core-contracts",
+        "praxis-runtime-mcp"
+      ],
+      "requirementIds": [
+        "REQ-MWI-001"
+      ],
+      "acceptanceCriterionIds": [
+        "REQ-MWI-001-AC-01",
+        "REQ-MWI-001-AC-02",
+        "REQ-MWI-001-AC-03",
+        "REQ-MWI-001-AC-04",
+        "REQ-MWI-001-AC-05",
+        "REQ-MWI-001-AC-06",
+        "REQ-MWI-001-AC-07",
+        "REQ-MWI-001-AC-08",
+        "REQ-MWI-001-AC-09"
+      ],
+      "storyIds": [],
+      "artifactRefs": [],
+      "decisions": [
+        "DEC-MWI-001"
+      ],
+      "assumptions": [],
+      "openQuestions": [],
+      "risks": [],
+      "blockers": [],
+      "decisionRecords": [],
+      "resolved": [],
+      "nextActions": [
+        "Contracts: open.sequence, WorkItem.links, link-work-item",
+        "Store: index/items layout, lock, migration, select-work-item",
+        "Tools + story-engine: workItemId",
+        "Tests incl. legacy migration and concurrency through MCP"
+      ],
+      "readiness": "ready",
+      "evidenceRefs": [],
+      "revision": 2,
+      "fingerprint": "sha256:6ce4e7e57916d1b09d6fa9d18156f66b7f225d8dbe0aa8758d3df8d07ca462cd"
+    }
+  ],
+  "findings": [],
+  "verdicts": [],
+  "decisions": [
+    {
+      "id": "DEC-MWI-001",
+      "statement": "Layout: .praxis/workflow/index.json {contract:'praxis.workflow.index', version:1, current, items[{workItemId, workflowId, projectId, title, jiraIssueKey?, stage, revision, updatedAt, links}]} plus .praxis/workflow/items/<workItemId>.json holding one unchanged WorkflowState. Identity: two open commands are the same item iff projectId, title and jiraIssueKey are equal; otherwise a new id WI-<SLUG>-<NNN> with the next free sequence for that slug (contracts: open gains optional sequence; WorkItem gains optional links; new command link-work-item{target:{repository,workItemId,relation:depends-on|blocks|relates-to|derived-from},remove?}). Store (workflow-store.ts): loadWorkflow(repo, workItemId?) resolves explicit id else index.current, never falling back on an unknown explicit id (WORK_ITEM_NOT_FOUND); all writes run under a directory lock .praxis/workflow/.lock (pid+timestamp, stale after 30s) with tmp+rename; open selects the new item and reports previousCurrent; reopening the same identity selects it with duplicate:true; store-level command select-work-item{workItemId} changes current (previewed, fingerprinted, lease-protected like other writes); status lists items and marks current. Tools: praxis_workflow_status/preview/apply gain optional workItemId. Migration: a legacy state.json is read as a single-item view; the first write moves it to items/<id>.json, writes index.json and replaces state.json with a tombstone {contract:'praxis.workflow.migrated'} so an older runtime fails to parse it (loud failure) instead of silently opening a second workflow. story-engine and Quality checks take the addressed workItemId; checks resolve .praxis/quality/<workItemId>/checks.json first, then .praxis/quality/checks.json.",
+      "confirmed": true,
+      "revision": 2
+    }
+  ],
+  "openQuestions": [],
+  "risks": [],
+  "blockers": [],
+  "assumptions": [],
+  "implementationUnits": [
+    {
+      "id": "IMPL-MWI-001",
+      "serviceId": "praxis-runtime-mcp",
+      "requirementIds": [
+        "REQ-MWI-001"
+      ],
+      "path": "packages/mcp/src/workflow-store.ts",
+      "summary": "praxis-core bf6a4e2/afe7807: open.sequence, workItemIdFor, WorkItem.links, link-work-item, select-work-item. praxis-runtime dfae63a + c48ad20: index.json + items/<id>.json layout, locked atomic writes, legacy migration with tombstone, workItemId on workflow tools and story-engine, per-item Quality checks, index-epoch and state-digest fingerprints so identical commands after a state change run instead of replaying. Tests: multi-work-item.test.ts (13) incl. legacy migration, 4-process lock contention (6 repeats stable), stale-preview rejection; accept:workflow/stories/generic green.",
+      "contractRef": "DEC-MWI-001",
+      "stale": false
+    }
+  ],
+  "stories": [],
+  "coverage": [],
+  "changes": [],
+  "stage": "in_progress",
+  "history": [
+    {
+      "revision": 1,
+      "stage": "draft",
+      "note": "Opening a second work item in a repository returns duplicate:true and silently resumes the first, because workflow state is one file (.praxis/workflow/state.json) holding one work item. During this dogfooding session four items needed separate repositories as a workaround. Needed: stable independent ids, explicit current-item selection, separate histories, no accidental overwrite, cross-repository references, reopening without duplication, per-item handoffs and verdicts, and a migration from the"
+    },
+    {
+      "revision": 2,
+      "stage": "in_progress",
+      "note": "ba → architect"
+    }
+  ]
+}
